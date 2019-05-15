@@ -11,11 +11,11 @@ namespace Tedd.Fodselsnummer
             "",
             "Feil lengde. Personnummer er 11 siffer.",
             "Personummer skal kun inneholde siffer.",
-            "Feil i personnummer.",
-            "Feil i personnummer.",
-            "Feil i personnummer.",
-            "Feil i personnummer.",
-            "Feil i personnummer."
+            "Feil i personnummer: Ugyldig individrekke.",
+            "Feil i personnummer: Ugyldig årsrekke.",
+            "Feil i personnummer: Ugyldig dato.",
+            "Feil i personnummer: Ugyldig kontrollsiffer 1.",
+            "Feil i personnummer: Ugyldig kontrollsiffer 2."
         };
 
         public bool Success { get; set; }
