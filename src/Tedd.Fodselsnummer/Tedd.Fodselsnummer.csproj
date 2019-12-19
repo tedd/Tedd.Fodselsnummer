@@ -2,8 +2,18 @@
 
   <PropertyGroup>
     <TargetFrameworks>
-      netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net45;net451;net452;net46;net461;net47;net471;net472;net48;
+      netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;netcoreapp3.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net45;net451;net452;net46;net461;net47;net471;net472;net48;
     </TargetFrameworks>
+    <PackageTags>fødselsnummer fodselsnummer personnummer norweigan social security number</PackageTags>
+    <PackageIcon></PackageIcon>
+    <PackageIconUrl />
+    <Authors>Tedd Hansen</Authors>
+    <Company>Tedd Hansen</Company>
+    <Description>Validates and extracts information from Norweigan social security numbers (fødselsnummer, personnummer).</Description>
+    <RepositoryUrl>https://github.com/tedd/Tedd.Fodselsnummer</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageProjectUrl>https://github.com/tedd/Tedd.Fodselsnummer</PackageProjectUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
 </Project>
