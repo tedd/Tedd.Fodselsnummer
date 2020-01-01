@@ -12,7 +12,17 @@ namespace Tedd.Fodselsnummer.Test
             for (var i = 0; i < nr.Length; i++)
             {
                 var pn = nr[i];
-                var result = FodselsnummerValidator.Validate(pn);
+var result = FodselsnummerValidator.Validate(pn);
+if (!result.Success)
+{
+Console.WriteLine(result.ErrorMessage);
+}
+else
+{
+Console.WriteLine($"Fødselsnummer type: {result.Type}");
+Console.WriteLine($"Kjønn: {result.Gender}");
+Console.WriteLine($"Fødselsdato: {result.Birthday}");
+                }
                 Assert.True(result.Success, $"{i}: {pn}: [{result.ErrorCode}] {result.ErrorMessage}");
             }
         }
