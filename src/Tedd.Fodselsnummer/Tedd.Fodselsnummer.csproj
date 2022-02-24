@@ -20,7 +20,7 @@
 		<AnalysisLevel>latest-all</AnalysisLevel>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
-		<PackageReleaseNotes>CultureInvariant number conversion internally, simplified framework targets, CLSCompliant assembly</PackageReleaseNotes>
+		<PackageReleaseNotes>nullable, CultureInvariant number conversion internally, simplified framework targets, CLSCompliant assembly</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>
