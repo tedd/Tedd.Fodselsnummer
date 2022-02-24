@@ -1,9 +1,9 @@
-﻿namespace Tedd.Fodselsnummer
+﻿namespace Tedd.Fodselsnummer;
+
+public enum Gender
 {
-    public enum Gender
-    {
-        Unknown,
-        Male,
-        Female
-    }
+    Unknown,
+    Male,
+    Female
 }
+

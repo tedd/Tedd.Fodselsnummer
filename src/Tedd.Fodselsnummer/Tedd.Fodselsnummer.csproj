@@ -1,27 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>
-      netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;netcoreapp3.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net45;net451;net452;net46;net461;net47;net471;net472;net48;
-    </TargetFrameworks>
-    <PackageTags>fødselsnummer fodselsnummer personnummer norweigan social security number</PackageTags>
-    <PackageIcon></PackageIcon>
-    <PackageIconUrl />
-    <Authors>Tedd Hansen</Authors>
-    <Company>Tedd Hansen</Company>
-    <Description>Validates and extracts information from Norweigan social security numbers (fødselsnummer, personnummer).</Description>
-    <RepositoryUrl>https://github.com/tedd/Tedd.Fodselsnummer</RepositoryUrl>
-    <RepositoryType>Git</RepositoryType>
-    <PackageProjectUrl>https://github.com/tedd/Tedd.Fodselsnummer</PackageProjectUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard1.2</TargetFramework>
+		<PackageTags>fødselsnummer;fodselsnummer;personnummer;norweigan social security number</PackageTags>
+		<PackageIcon></PackageIcon>
+		<PackageIconUrl />
+		<Description>Extracts and validates information from Norweigan social security numbers (fødselsnummer, personnummer).</Description>
+		<RepositoryUrl>https://github.com/tedd/Tedd.Fodselsnummer.git</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/tedd/Tedd.Fodselsnummer</PackageProjectUrl>
+		<Authors>tedd</Authors>
+		<Company>Tedd Hansen</Company>
+		<RepositoryType>git</RepositoryType>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<Copyright>Tedd Hansen</Copyright>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>latest-all</AnalysisLevel>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<PackageReleaseNotes>CultureInvariant number conversion internally, simplified framework targets, CLSCompliant assembly</PackageReleaseNotes>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Nerdbank.GitVersioning" Version="3.4.255">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
 
 </Project>
