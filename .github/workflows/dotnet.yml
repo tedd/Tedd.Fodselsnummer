@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-test-publish:
 
     runs-on: ubuntu-latest
 
@@ -29,10 +29,10 @@ jobs:
       working-directory: src
       run: dotnet test --no-build --verbosity normal
 
-    - name: Get version
-      uses: dotnet/nbgv@master
-      id: nbgv
-    - run: echo 'SemVer2=${{ steps.nbgv.outputs.SemVer2 }}'
+#    - name: Get version
+#      uses: dotnet/nbgv@master
+#      id: nbgv
+#    - run: echo 'SemVer2=${{ steps.nbgv.outputs.SemVer2 }}'
 
     # Publish
     - name: publish on version change
@@ -67,7 +67,7 @@ jobs:
         # VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
 
         # Useful with external providers like Nerdbank.GitVersioning where you could for example set it to variable (dollar){{env.GitBuildVersionSimple}}. Ignores VERSION_FILE_PATH & VERSION_REGEX.
-        VERSION_STATIC: ${{env.GitBuildVersionSimple}}
+        #VERSION_STATIC: ${{env.GitBuildVersionSimple}}
         
         # Rebuild project in release mode? You may turn this off if you have built project in previous step. (default: true)
         #REBUILD_PROJECT: true
