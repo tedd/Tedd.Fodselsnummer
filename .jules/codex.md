@@ -1,0 +1,3 @@
+## 2024-05-25 - Architectural Discrepancy Observation
+**Observation:** The requested mandate references "hierarchical data binding and routed event infrastructure," which is inaccurate regarding the current project framework. `Tedd.Fodselsnummer` is a deterministic, stateless parsing utility without UI components, data binding, or routed events. The documentation must reflect this reality to avoid "neuro-bunk."
+**Strategic Action:** Document the deterministic validation flow exactly as implemented, strictly separating factual structural operations (string parsing, extraction, Modulus 11 validation) from hypothetical architectural capabilities.
