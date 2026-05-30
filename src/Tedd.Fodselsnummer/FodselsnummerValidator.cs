@@ -5,7 +5,7 @@ namespace Tedd.Fodselsnummer;
 
 /// <summary>
 /// Time Complexity: O(1) - The validation process executes in constant time as the input length is strictly bounded to 11 characters.
-/// Space Complexity: O(1) - Validation uses only bounded local state and avoids intermediate heap allocations such as Regex, LINQ, or parsing-related temporaries during the validation logic.
+/// Space Complexity: O(1) - Validation relies solely on stack-allocated structures and local variables, eliminating any heap allocations during the process.
 /// </summary>
 public static class FodselsnummerValidator
 {
