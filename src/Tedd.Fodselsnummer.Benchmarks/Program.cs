@@ -11,7 +11,7 @@ public class ValidatorBenchmarks
     [Benchmark(Baseline = true)]
     public void ArchiveValidator()
     {
-        var result = Archive.FodselsnummerValidator.Validate(ValidFodselsnummer);
+        var result = Tedd.Fodselsnummer.Archive.FodselsnummerValidator.Validate(ValidFodselsnummer);
     }
 
     [Benchmark]
