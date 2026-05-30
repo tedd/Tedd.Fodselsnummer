@@ -25,9 +25,9 @@ The operational reality of the validation process consists of the following dete
 *   Implementation of zero-allocation string parsing utilizing `Span<T>` and `ReadOnlySpan<T>` to bypass Regex overhead and eliminate heap allocations.
 *   Integration of high-performance source generators for deterministic build-time validation of static identity markers.
 
-## Implementation Example (.NET 9.0+)
+## Implementation Example (C# 11+)
 
-The following structural API usage demonstrates modern C# top-level syntax and verbatim interpolated strings:
+The following structural API usage demonstrates modern C# top-level statements and raw interpolated string literals:
 
 ```csharp
 using System;
