@@ -9,15 +9,15 @@ public class ValidatorBenchmarks
     private const string ValidFodselsnummer = "19121950041";
 
     [Benchmark(Baseline = true)]
-    public void ArchiveValidator()
+    public Tedd.Fodselsnummer.Archive.FodselsnummerResult ArchiveValidator()
     {
-        var result = Tedd.Fodselsnummer.Archive.FodselsnummerValidator.Validate(ValidFodselsnummer);
+        return Tedd.Fodselsnummer.Archive.FodselsnummerValidator.Validate(ValidFodselsnummer);
     }
 
     [Benchmark]
-    public void NewValidator()
+    public Tedd.Fodselsnummer.FodselsnummerResult NewValidator()
     {
-        var result = Tedd.Fodselsnummer.FodselsnummerValidator.Validate(ValidFodselsnummer);
+        return Tedd.Fodselsnummer.FodselsnummerValidator.Validate(ValidFodselsnummer);
     }
 }
 
