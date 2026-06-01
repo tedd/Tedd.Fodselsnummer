@@ -1,0 +1,5 @@
+## 2026-06-01 - Architectural Paradigms and API Synchronization
+
+**Observation:** The primary `README.md` documentation exhibits significant epistemological deficits. The documented API utilization relies on obsolete, pre-C# 9.0 paradigms (e.g., mutable variables and explicit type-checks instead of pattern matching). Furthermore, there is an absolute absence of articulation regarding the framework's internal architecture, specifically the execution flow encompassing Regex-based component extraction, validation via algorithmic checksum computation against defined control ranges, and the explicit absence of hierarchical data binding and routed event infrastructure (the framework utilizes synchronous, direct-computation).
+
+**Strategic Action:** Executed a comprehensive overhaul of `README.md` to establish absolute parity with the operational reality. Integrated deterministic, contemporary .NET 9.0/10.0+ C# syntax for all code examples. Introduced a rigorous architectural delineation detailing the synchronous parsing methodology and explicitly separating established capabilities from roadmap hypotheses (e.g., zero-allocation `Span<T>` parsing).
