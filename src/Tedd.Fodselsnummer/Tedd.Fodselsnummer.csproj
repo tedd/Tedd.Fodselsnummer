@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard1.2</TargetFramework>
+		<TargetFrameworks>netstandard1.2;netstandard2.0;net8.0;net10.0</TargetFrameworks>
 		<PackageTags>fødselsnummer;fodselsnummer;personnummer;norweigan social security number</PackageTags>
 		<PackageIcon></PackageIcon>
-		<PackageIconUrl />
 		<Description>Extracts and validates information from Norweigan social security numbers (fødselsnummer, personnummer).</Description>
 		<RepositoryUrl>https://github.com/tedd/Tedd.Fodselsnummer.git</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/tedd/Tedd.Fodselsnummer</PackageProjectUrl>
@@ -33,6 +32,11 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.2' Or '$(TargetFramework)' == 'netstandard2.0'">
+	  <PackageReference Include="System.Net.Http" Version="4.3.4" />
+	  <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 	</ItemGroup>
 
 </Project>
