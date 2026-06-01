@@ -27,11 +27,21 @@ public static class FodselsnummerValidator
         };
 
     private static Regex PersonalNumberRegex = new Regex(@"^(?<birthdate>(?<day>\d\d)(?<month>\d\d)(?<year>\d\d))(?<individual>\d\d(?<gender>\d))(?<checksum>\d\d)$");
+    /// <summary>
+    /// Validates a Norwegian national identity number from a long integer.
+    /// Time Complexity: O(1)
+    /// Space Complexity: O(1) (allocates fixed strings for validation)
+    /// </summary>
     public static FodselsnummerResult Validate(long number)
     {
         return Validate(number.ToString(CultureInfo.InvariantCulture));
     }
 
+    /// <summary>
+    /// Validates a Norwegian national identity number from a string.
+    /// Time Complexity: O(1) (fixed length string of 11 characters)
+    /// Space Complexity: O(1) (allocates a constant number of strings and structures)
+    /// </summary>
     public static FodselsnummerResult Validate(string number)
     {
         // Is it the correct length?
