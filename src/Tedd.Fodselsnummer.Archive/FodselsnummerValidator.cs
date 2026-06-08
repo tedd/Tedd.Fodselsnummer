@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 [assembly: CLSCompliant(true)]
-namespace Tedd.Fodselsnummer;
+namespace Tedd.Fodselsnummer.Archive;
 
 public static class FodselsnummerValidator
 {
@@ -26,6 +26,7 @@ public static class FodselsnummerValidator
             new IndividualNumberControlRange() { From = 900, To = 999, FromYear = 1940, ToYear = 1999 },
         };
 
+    private static Regex PersonalNumberRegex = new Regex(@"^(?<birthdate>(?<day>\d\d)(?<month>\d\d)(?<year>\d\d))(?<individual>\d\d(?<gender>\d))(?<checksum>\d\d)$");
     public static FodselsnummerResult Validate(long number)
     {
         return Validate(number.ToString(CultureInfo.InvariantCulture));
@@ -33,43 +34,28 @@ public static class FodselsnummerValidator
 
     public static FodselsnummerResult Validate(string number)
     {
-        // Time Complexity: O(1) - Constant time as the input is always exactly 11 characters.
-        // Space Complexity: O(1) - Constant space, zero allocations on modern frameworks (stackalloc), minimal array allocation on legacy targets.
-        if (number == null)
-            return FodselsnummerResult.FromError(1);
-
         // Is it the correct length?
-        if (number.Length != 11)
+        if (number == null || number.Length != 11)
             return FodselsnummerResult.FromError(1);
 
-#if NET45 || NETSTANDARD1_2
-        int[] digits = new int[11];
-#else
-        Span<int> digits = stackalloc int[11];
-#endif
-        long parsedFodselsnummer = 0;
+        // Extract what we need
+        var match = PersonalNumberRegex.Match(number);
 
-        for (int i = 0; i < 11; i++)
-        {
-            if ((uint)(number[i] - '0') > 9)
-            {
-                return FodselsnummerResult.FromError(2);
-            }
-            digits[i] = number[i] - '0';
-            parsedFodselsnummer = parsedFodselsnummer * 10 + digits[i];
-        }
+        // Regex is only looking for 11 numbers, so we can assume any error is because there are non-numbers
+        if (!match.Success)
+            return FodselsnummerResult.FromError(2);
 
         // Parse the numbers
-        var day = digits[0] * 10 + digits[1];
-        var month = digits[2] * 10 + digits[3];
-        var year = digits[4] * 10 + digits[5];
-        var individual = digits[6] * 100 + digits[7] * 10 + digits[8];
-        var gender = digits[8];
-        var checksum = digits[9] * 10 + digits[10];
+        var day = int.Parse(match.Groups["day"].Value, CultureInfo.InvariantCulture);
+        var month = int.Parse(match.Groups["month"].Value, CultureInfo.InvariantCulture);
+        var year = int.Parse(match.Groups["year"].Value, CultureInfo.InvariantCulture);
+        var individual = int.Parse(match.Groups["individual"].Value, CultureInfo.InvariantCulture);
+        var gender = int.Parse(match.Groups["gender"].Value, CultureInfo.InvariantCulture);
+        var checksum = int.Parse(match.Groups["checksum"].Value, CultureInfo.InvariantCulture);
 
         var result = new FodselsnummerResult()
         {
-            Fodselsnummer = parsedFodselsnummer,
+            Fodselsnummer = long.Parse(number, CultureInfo.InvariantCulture),
             Individnummer = individual,
             Kontrollsifre = checksum
         };
@@ -135,19 +121,21 @@ public static class FodselsnummerValidator
         } // End of "only if not FH"-check
 
         // And finally calculate and verify the two checksum digits at the end of the number
+        // Convert personal number string to int array
+        var n = number.Select(c => int.Parse(c.ToString(), CultureInfo.InvariantCulture)).ToArray();
 
         // Calculate checksum number 1
-        int k1 = 11 - (3 * digits[0] + 7 * digits[1] + 6 * digits[2] + 1 * digits[3] + 8 * digits[4] + 9 * digits[5] + 4 * digits[6] + 5 * digits[7] + 2 * digits[8]) % 11;
+        int k1 = 11 - (3 * n[0] + 7 * n[1] + 6 * n[2] + 1 * n[3] + 8 * n[4] + 9 * n[5] + 4 * n[6] + 5 * n[7] + 2 * n[8]) % 11;
         if (k1 == 11) k1 = 0;
 
-        if (k1 == 10 || k1 != digits[9])
+        if (k1 == 10 || k1 != n[9])
             return FodselsnummerResult.FromError(6);
 
         // Calculate checksum number 2
-        int k2 = 11 - (5 * digits[0] + 4 * digits[1] + 3 * digits[2] + 2 * digits[3] + 7 * digits[4] + 6 * digits[5] + 5 * digits[6] + 4 * digits[7] + 3 * digits[8] + 2 * k1) % 11;
+        int k2 = 11 - (5 * n[0] + 4 * n[1] + 3 * n[2] + 2 * n[3] + 7 * n[4] + 6 * n[5] + 5 * n[6] + 4 * n[7] + 3 * n[8] + 2 * k1) % 11;
         if (k2 == 11) k2 = 0;
 
-        if (k2 == 10 || k2 != digits[10])
+        if (k2 == 10 || k2 != n[10])
             return FodselsnummerResult.FromError(7);
 
         result.Success = true;
