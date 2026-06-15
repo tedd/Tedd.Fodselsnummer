@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
+
 [assembly: CLSCompliant(true)]
-namespace Tedd.Fodselsnummer;
+namespace Tedd.Fodselsnummer.Archive;
 
 public static class FodselsnummerValidator
 {
@@ -24,57 +26,36 @@ public static class FodselsnummerValidator
             new IndividualNumberControlRange() { From = 900, To = 999, FromYear = 1940, ToYear = 1999 },
         };
 
-    /// <summary>
-    /// Validates a Norwegian personal identification number.
-    /// Time Complexity: O(1) - Constant time as it always processes exactly 11 characters.
-    /// Space Complexity: O(1) - Zero allocation parsing using ReadOnlySpan and stack-allocated primitives.
-    /// </summary>
+    private static Regex PersonalNumberRegex = new Regex(@"^(?<birthdate>(?<day>\d\d)(?<month>\d\d)(?<year>\d\d))(?<individual>\d\d(?<gender>\d))(?<checksum>\d\d)$");
     public static FodselsnummerResult Validate(long number)
     {
         return Validate(number.ToString(CultureInfo.InvariantCulture));
     }
 
-    /// <summary>
-    /// Validates a Norwegian personal identification number.
-    /// Time Complexity: O(1) - Constant time as it always processes exactly 11 characters.
-    /// Space Complexity: O(1) - Zero allocation parsing using ReadOnlySpan and stack-allocated primitives.
-    /// </summary>
     public static FodselsnummerResult Validate(string number)
     {
         // Is it the correct length?
-        if (string.IsNullOrEmpty(number) || number.Length != 11)
+        if (number == null || number.Length != 11)
             return FodselsnummerResult.FromError(1);
 
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-        ReadOnlySpan<char> span = number.AsSpan();
-#else
-        string span = number;
-#endif
+        // Extract what we need
+        var match = PersonalNumberRegex.Match(number);
 
-        // Ensure all characters are digits
-        for (int i = 0; i < 11; i++)
-        {
-            if (span[i] < '0' || span[i] > '9')
-                return FodselsnummerResult.FromError(2);
-        }
+        // Regex is only looking for 11 numbers, so we can assume any error is because there are non-numbers
+        if (!match.Success)
+            return FodselsnummerResult.FromError(2);
 
-        // Parse the numbers using direct arithmetic (zero-allocation)
-        int day = (span[0] - '0') * 10 + (span[1] - '0');
-        int month = (span[2] - '0') * 10 + (span[3] - '0');
-        int year = (span[4] - '0') * 10 + (span[5] - '0');
-        int individual = (span[6] - '0') * 100 + (span[7] - '0') * 10 + (span[8] - '0');
-        int gender = span[8] - '0';
-        int checksum = (span[9] - '0') * 10 + (span[10] - '0');
-
-        long fodselsnummer = 0;
-        for (int i = 0; i < 11; i++)
-        {
-            fodselsnummer = fodselsnummer * 10 + (span[i] - '0');
-        }
+        // Parse the numbers
+        var day = int.Parse(match.Groups["day"].Value, CultureInfo.InvariantCulture);
+        var month = int.Parse(match.Groups["month"].Value, CultureInfo.InvariantCulture);
+        var year = int.Parse(match.Groups["year"].Value, CultureInfo.InvariantCulture);
+        var individual = int.Parse(match.Groups["individual"].Value, CultureInfo.InvariantCulture);
+        var gender = int.Parse(match.Groups["gender"].Value, CultureInfo.InvariantCulture);
+        var checksum = int.Parse(match.Groups["checksum"].Value, CultureInfo.InvariantCulture);
 
         var result = new FodselsnummerResult()
         {
-            Fodselsnummer = fodselsnummer,
+            Fodselsnummer = long.Parse(number, CultureInfo.InvariantCulture),
             Individnummer = individual,
             Kontrollsifre = checksum
         };
@@ -140,20 +121,21 @@ public static class FodselsnummerValidator
         } // End of "only if not FH"-check
 
         // And finally calculate and verify the two checksum digits at the end of the number
-        // Calculate checksum number 1 using the span directly
-        int k1 = 11 - (3 * (span[0] - '0') + 7 * (span[1] - '0') + 6 * (span[2] - '0') + 1 * (span[3] - '0') +
-                       8 * (span[4] - '0') + 9 * (span[5] - '0') + 4 * (span[6] - '0') + 5 * (span[7] - '0') + 2 * (span[8] - '0')) % 11;
+        // Convert personal number string to int array
+        var n = number.Select(c => int.Parse(c.ToString(), CultureInfo.InvariantCulture)).ToArray();
+
+        // Calculate checksum number 1
+        int k1 = 11 - (3 * n[0] + 7 * n[1] + 6 * n[2] + 1 * n[3] + 8 * n[4] + 9 * n[5] + 4 * n[6] + 5 * n[7] + 2 * n[8]) % 11;
         if (k1 == 11) k1 = 0;
 
-        if (k1 == 10 || k1 != (span[9] - '0'))
+        if (k1 == 10 || k1 != n[9])
             return FodselsnummerResult.FromError(6);
 
-        // Calculate checksum number 2 using the span directly
-        int k2 = 11 - (5 * (span[0] - '0') + 4 * (span[1] - '0') + 3 * (span[2] - '0') + 2 * (span[3] - '0') +
-                       7 * (span[4] - '0') + 6 * (span[5] - '0') + 5 * (span[6] - '0') + 4 * (span[7] - '0') + 3 * (span[8] - '0') + 2 * k1) % 11;
+        // Calculate checksum number 2
+        int k2 = 11 - (5 * n[0] + 4 * n[1] + 3 * n[2] + 2 * n[3] + 7 * n[4] + 6 * n[5] + 5 * n[6] + 4 * n[7] + 3 * n[8] + 2 * k1) % 11;
         if (k2 == 11) k2 = 0;
 
-        if (k2 == 10 || k2 != (span[10] - '0'))
+        if (k2 == 10 || k2 != n[10])
             return FodselsnummerResult.FromError(7);
 
         result.Success = true;
