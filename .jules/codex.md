@@ -1,0 +1,3 @@
+## 2024-05-18 - Documentation Drift Identification
+**Observation:** The README.md documentation currently fails to articulate the comprehensive capabilities of the `FodselsnummerValidator`, specifically its support for alternate identity number formats (D-numbers, H-numbers, and the recently integrated FH-numbers). Furthermore, the existing documentation lacks an explicit architectural overview delineating the validation mechanisms and result structures.
+**Strategic Action:** Restructure README.md to incorporate a formal architectural overview, detail the exact functional capabilities (including supported identity number types), delineate established facts from future roadmap hypotheses, and provide syntactically verified, contemporary .NET code examples.
