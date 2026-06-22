@@ -57,13 +57,24 @@ public static class FodselsnummerValidator
         int individual = (span[6] - '0') * 100 + (span[7] - '0') * 10 + (span[8] - '0');
         int gender = span[8] - '0';
         int checksum = (span[9] - '0') * 10 + (span[10] - '0');
+
+        int n0 = span[0] - '0';
+        int n1 = span[1] - '0';
+        int n2 = span[2] - '0';
+        int n3 = span[3] - '0';
+        int n4 = span[4] - '0';
+        int n5 = span[5] - '0';
+        int n6 = span[6] - '0';
+        int n7 = span[7] - '0';
+        int n8 = span[8] - '0';
+        int n9 = span[9] - '0';
+        int n10 = span[10] - '0';
 #else
         // Fallback for older frameworks
         var match = System.Text.RegularExpressions.Regex.Match(number, @"^(?<birthdate>(?<day>\d\d)(?<month>\d\d)(?<year>\d\d))(?<individual>\d\d(?<gender>\d))(?<checksum>\d\d)$");
 
         if (!match.Success)
             return FodselsnummerResult.FromError(2);
-        }
 
         var day = int.Parse(match.Groups["day"].Value, CultureInfo.InvariantCulture);
         var month = int.Parse(match.Groups["month"].Value, CultureInfo.InvariantCulture);
@@ -71,6 +82,10 @@ public static class FodselsnummerValidator
         var individual = int.Parse(match.Groups["individual"].Value, CultureInfo.InvariantCulture);
         var gender = int.Parse(match.Groups["gender"].Value, CultureInfo.InvariantCulture);
         var checksum = int.Parse(match.Groups["checksum"].Value, CultureInfo.InvariantCulture);
+
+        var n = number.Select(c => int.Parse(c.ToString(), CultureInfo.InvariantCulture)).ToArray();
+        int n0 = n[0]; int n1 = n[1]; int n2 = n[2]; int n3 = n[3]; int n4 = n[4];
+        int n5 = n[5]; int n6 = n[6]; int n7 = n[7]; int n8 = n[8]; int n9 = n[9]; int n10 = n[10];
 #endif
 
         var result = new FodselsnummerResult()
@@ -113,13 +128,11 @@ public static class FodselsnummerValidator
             // Get the range based on the individual range
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
             // Avoid LINQ overhead where possible
-            bool individualRangeMatched = false;
             for (int i = 0; i < IndividualControlRange.Length; i++)
             {
                 var r = IndividualControlRange[i];
                 if (individual >= r.From && individual <= r.To)
                 {
-                    individualRangeMatched = true;
                     int rangeCentury = r.FromYear / 100;
                     int fYear = rangeCentury * 100 + year;
 
@@ -130,9 +143,6 @@ public static class FodselsnummerValidator
                     }
                 }
             }
-
-            if (!individualRangeMatched)
-                return FodselsnummerResult.FromError(3);
 #else
             var ranges = IndividualControlRange.Where(r => individual >= r.From && individual <= r.To).ToList();
             if (ranges == null || ranges.Count == 0)
@@ -140,18 +150,15 @@ public static class FodselsnummerValidator
 
             foreach (var range in ranges)
             {
-                if (individual >= range.From && individual <= range.To)
-                {
-                    rangeFound = true;
-                    // Note that if there is a change to range so it crosses centuries then we need more checking here - or else the next check will fail
-                    var fYear = (range.FromYear / 100) * 100 + year;
+                // Get full year based on the range
+                // Note that if there is a change to range so it crosses centuries then we need more checking here - or else the next check will fail
+                var fYear = int.Parse(range.FromYear.ToString(CultureInfo.InvariantCulture).Substring(0, 2) + year.ToString("D2", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
 
-                    // Check that we are within allowed range
-                    if (fYear >= range.FromYear && fYear <= range.ToYear)
-                    {
-                        fullYear = fYear;
-                        break;
-                    }
+                // Check that we are within allowed range
+                if (fYear >= range.FromYear && fYear <= range.ToYear)
+                {
+                    fullYear = fYear;
+                    break;
                 }
             }
 #endif
@@ -170,23 +177,6 @@ public static class FodselsnummerValidator
         } // End of "only if not FH"-check
 
         // And finally calculate and verify the two checksum digits at the end of the number
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-        int n0 = span[0] - '0';
-        int n1 = span[1] - '0';
-        int n2 = span[2] - '0';
-        int n3 = span[3] - '0';
-        int n4 = span[4] - '0';
-        int n5 = span[5] - '0';
-        int n6 = span[6] - '0';
-        int n7 = span[7] - '0';
-        int n8 = span[8] - '0';
-        int n9 = span[9] - '0';
-        int n10 = span[10] - '0';
-#else
-        var n = number.Select(c => int.Parse(c.ToString(), CultureInfo.InvariantCulture)).ToArray();
-        int n0 = n[0]; int n1 = n[1]; int n2 = n[2]; int n3 = n[3]; int n4 = n[4];
-        int n5 = n[5]; int n6 = n[6]; int n7 = n[7]; int n8 = n[8]; int n9 = n[9]; int n10 = n[10];
-#endif
 
         // Calculate checksum number 1
         int k1 = 11 - (3 * n0 + 7 * n1 + 6 * n2 + 1 * n3 + 8 * n4 + 9 * n5 + 4 * n6 + 5 * n7 + 2 * n8) % 11;
