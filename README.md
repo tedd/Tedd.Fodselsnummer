@@ -23,7 +23,7 @@ While the established capabilities rely on `String`-based Regex parsing, ongoing
 
 ## Implementation Example
 
-The following example demonstrates contemporary framework usage leveraging .NET 9.0/10.0+ syntax (including pattern matching) for maximum lexical precision and conciseness:
+The following example demonstrates contemporary C# usage (including pattern matching) for concise validation handling:
 
 ```csharp
 using System;
