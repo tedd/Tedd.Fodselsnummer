@@ -4,7 +4,7 @@
 
 ## Architectural Articulation
 
-The `Tedd.Fodselsnummer` library operates as a deterministic validation engine engineered to authenticate the structural and mathematical integrity of Norwegian identity identifiers. The framework relies on a rigorous verification pipeline ensuring absolute parity between the provided string sequence and the governmental specification algorithm.
+`Tedd.Fodselsnummer` is a high-performance C#/.NET structural library engineered for the parsing, validation, and data extraction of Norwegian national identity numbers.
 
 ### Implemented Framework Capabilities (Operational Reality)
 
