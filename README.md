@@ -35,7 +35,7 @@ if (result is { Success: true })
 {
     Console.WriteLine($"Fødselsnummer type: {result.Type}");
     Console.WriteLine($"Kjønn: {result.Gender}");
-    Console.WriteLine($"Fødselsdato: {result.Birthday:yyyy-MM-dd}");
+    Console.WriteLine($"Fødselsdato: {result.Birthday?.ToString("yyyy-MM-dd") ?? "N/A"}");
 }
 else
 {
