@@ -1,31 +1,28 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 
-namespace Tedd.Fodselsnummer.Benchmarks
+[MemoryDiagnoser]
+public class ValidationBenchmarks
 {
-    [MemoryDiagnoser]
-    public class ValidateBenchmarks
+    private const string validNumber = "19121950041";
+
+    [Benchmark(Baseline = true)]
+    public void Legacy()
     {
-        private const string TestNumber = "12345678901"; // Placeholder for a valid format
-
-        [Benchmark(Baseline = true)]
-        public Fodselsnummer.Archive.FodselsnummerResult ValidateArchive()
-        {
-            return Fodselsnummer.Archive.FodselsnummerValidator.Validate(TestNumber);
-        }
-
-        [Benchmark]
-        public Fodselsnummer.FodselsnummerResult ValidateOptimized()
-        {
-            return Fodselsnummer.FodselsnummerValidator.Validate(TestNumber);
-        }
+        Tedd.Fodselsnummer.Archive.FodselsnummerValidator.Validate(validNumber);
     }
 
-    public class Program
+    [Benchmark]
+    public void Optimized()
     {
-        public static void Main(string[] args)
-        {
-            BenchmarkRunner.Run<ValidateBenchmarks>();
-        }
+        Tedd.Fodselsnummer.FodselsnummerValidator.Validate(validNumber);
+    }
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        BenchmarkRunner.Run<ValidationBenchmarks>();
     }
 }

@@ -63,6 +63,7 @@ public static class FodselsnummerValidator
 
         if (!match.Success)
             return FodselsnummerResult.FromError(2);
+        }
 
         var day = int.Parse(match.Groups["day"].Value, CultureInfo.InvariantCulture);
         var month = int.Parse(match.Groups["month"].Value, CultureInfo.InvariantCulture);
@@ -134,15 +135,18 @@ public static class FodselsnummerValidator
 
             foreach (var range in ranges)
             {
-                // Get full year based on the range
-                // Note that if there is a change to range so it crosses centuries then we need more checking here - or else the next check will fail
-                var fYear = int.Parse(range.FromYear.ToString(CultureInfo.InvariantCulture).Substring(0, 2) + year.ToString("D2", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
-
-                // Check that we are within allowed range
-                if (fYear >= range.FromYear && fYear <= range.ToYear)
+                if (individual >= range.From && individual <= range.To)
                 {
-                    fullYear = fYear;
-                    break;
+                    rangeFound = true;
+                    // Note that if there is a change to range so it crosses centuries then we need more checking here - or else the next check will fail
+                    var fYear = (range.FromYear / 100) * 100 + year;
+
+                    // Check that we are within allowed range
+                    if (fYear >= range.FromYear && fYear <= range.ToYear)
+                    {
+                        fullYear = fYear;
+                        break;
+                    }
                 }
             }
 #endif
