@@ -15,7 +15,7 @@ The internal validation mechanism processes input via the following sequential p
 1. **Component Extraction:** A sophisticated Regular Expression (Regex) identifies and isolates the constituent segments of the numerical sequence (birth date, individual identifier, and dual checksums).
 2. **Contextual Normalization:** Compensatory algorithms detect and normalize specialized number classes (D, H, and FH-numbers), adjusting the chronological and demographic segments for precise evaluation.
 3. **Century Resolution:** The individual identifier is mapped against established control ranges (`IndividualNumberControlRange`) to deduce the exact century of birth, thus overcoming the intrinsic Y2K ambiguity of the raw date string.
-4. **Algorithmic Validation:** The ultimate validation is performed via a rigid modulo 11 checksum calculation applied against the first and second checksum digits, assuring cryptographic integrity of the provided sequence.
+4. **Algorithmic Validation:** The ultimate validation is performed via a rigid modulo 11 checksum calculation applied against the first and second checksum digits, detecting invalid or mistyped sequences.
 
 ### Future Hypotheses (Roadmap)
 
