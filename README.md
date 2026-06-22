@@ -1,44 +1,34 @@
 # Tedd.Fodselsnummer
 
-C#/.NET parser for fødselsnummer / Norwegian national identity number.
+## Architectural Overview
+Tedd.Fodselsnummer is a high-performance C#/.NET structural library engineered for the parsing, validation, and temporal data extraction of Norwegian national identity numbers.
 
-This framework facilitates the extraction and rigorous validation of demographic parameters embedded within the Norwegian national identity number (`fødselsnummer`), including derivatives such as D-numbers, H-numbers, and FH-numbers.
+The operational reality of the framework encompasses formal Mod11 checksum verification and deterministic parsing of the following supported identity protocols:
+*   **Fødselsnummer (Normal):** Standard national identity number.
+*   **D-nummer (D):** Temporary identity numbers with mathematically shifted day components.
+*   **H-nummer (H):** Health institution specific identifiers with shifted month components.
+*   **FH-nummer (FH):** Shared health identifiers featuring specific structural prefixes.
 
-## Architectural Delineation
-
-The framework employs a deterministic, synchronous direct-computation paradigm to resolve and validate identity numbers. It operates purely on functional transformations and mathematical validation, strictly isolating itself from any form of hierarchical data binding or routed event infrastructure.
-
-### Execution Flow
-
-The internal validation mechanism processes input via the following sequential phases:
-
-1. **Component Extraction:** A sophisticated Regular Expression (Regex) identifies and isolates the constituent segments of the numerical sequence (birth date, individual identifier, and dual checksums).
-2. **Contextual Normalization:** Compensatory algorithms detect and normalize specialized number classes (D, H, and FH-numbers), adjusting the chronological and demographic segments for precise evaluation.
-3. **Century Resolution:** The individual identifier is mapped against established control ranges (`IndividualNumberControlRange`) to deduce the exact century of birth, thus overcoming the intrinsic Y2K ambiguity of the raw date string.
-4. **Algorithmic Validation:** The ultimate validation is performed via a rigid modulo 11 checksum calculation applied against the first and second checksum digits, detecting invalid or mistyped sequences.
-
-### Future Hypotheses (Roadmap)
-
-While the established capabilities rely on `String`-based Regex parsing, ongoing research hypothetically explores the integration of high-performance, low-allocation memory structures (e.g., zero-allocation `Span<T>` and `ReadOnlySpan<char>` parsing methodologies) to mitigate garbage collection pressure during bulk validation scenarios. These enhancements remain speculative and are not present in the current operational runtime.
-
-## Implementation Example
-
-The following example demonstrates contemporary C# usage (including pattern matching) for concise validation handling:
+## Contemporary Implementation Example
+The following code exemplifies the API surface utilizing modern .NET top-level statements for deterministic validation and epistemological extraction.
 
 ```csharp
 using System;
 using Tedd.Fodselsnummer;
 
-var result = FodselsnummerValidator.Validate("19121950041");
+var validationResult = FodselsnummerValidator.Validate("19121950041");
 
-if (result is { Success: true })
+if (!validationResult.Success)
 {
-    Console.WriteLine($"Fødselsnummer type: {result.Type}");
-    Console.WriteLine($"Kjønn: {result.Gender}");
-    Console.WriteLine($"Fødselsdato: {result.Birthday?.ToString("yyyy-MM-dd") ?? "N/A"}");
+    Console.WriteLine($"Validation Error: {validationResult.ErrorMessage}");
 }
 else
 {
-    Console.WriteLine($"Validation failed: {result.ErrorMessage}");
+    Console.WriteLine($"Identity Type: {validationResult.Type}");
+    Console.WriteLine($"Biological Gender: {validationResult.Gender}");
+    Console.WriteLine($"Temporal Origin (Birthday): {validationResult.Birthday:yyyy-MM-dd}");
 }
 ```
+
+## Planned Enhancements (Hypotheses)
+The current framework relies on `System.String` implementations. Future iterations hypothesize zero-allocation parsing utilizing `ReadOnlySpan<char>` paradigms to minimize Garbage Collector pressure and increase processing throughput.
