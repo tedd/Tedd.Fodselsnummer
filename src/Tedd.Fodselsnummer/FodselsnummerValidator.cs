@@ -113,11 +113,13 @@ public static class FodselsnummerValidator
             // Get the range based on the individual range
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
             // Avoid LINQ overhead where possible
+            bool individualRangeMatched = false;
             for (int i = 0; i < IndividualControlRange.Length; i++)
             {
                 var r = IndividualControlRange[i];
                 if (individual >= r.From && individual <= r.To)
                 {
+                    individualRangeMatched = true;
                     int rangeCentury = r.FromYear / 100;
                     int fYear = rangeCentury * 100 + year;
 
@@ -128,6 +130,9 @@ public static class FodselsnummerValidator
                     }
                 }
             }
+
+            if (!individualRangeMatched)
+                return FodselsnummerResult.FromError(3);
 #else
             var ranges = IndividualControlRange.Where(r => individual >= r.From && individual <= r.To).ToList();
             if (ranges == null || ranges.Count == 0)
