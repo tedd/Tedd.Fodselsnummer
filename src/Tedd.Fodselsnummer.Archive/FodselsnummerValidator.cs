@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 [assembly: CLSCompliant(true)]
-namespace Tedd.Fodselsnummer;
+namespace Tedd.Fodselsnummer.Archive;
 
 public static class FodselsnummerValidator
 {
@@ -26,45 +26,32 @@ public static class FodselsnummerValidator
             new IndividualNumberControlRange() { From = 900, To = 999, FromYear = 1940, ToYear = 1999 },
         };
 
+    private static Regex PersonalNumberRegex = new Regex(@"^(?<birthdate>(?<day>\d\d)(?<month>\d\d)(?<year>\d\d))(?<individual>\d\d(?<gender>\d))(?<checksum>\d\d)$");
     public static FodselsnummerResult Validate(long number)
     {
         return Validate(number.ToString(CultureInfo.InvariantCulture));
     }
 
-    // Time complexity: O(1)
-    // Space complexity: O(1)
     public static FodselsnummerResult Validate(string number)
     {
         // Is it the correct length?
         if (number == null || number.Length != 11)
             return FodselsnummerResult.FromError(1);
 
-        // Parse and validate digits manually to eliminate allocations
-        int n0 = number[0] - '0';
-        int n1 = number[1] - '0';
-        int n2 = number[2] - '0';
-        int n3 = number[3] - '0';
-        int n4 = number[4] - '0';
-        int n5 = number[5] - '0';
-        int n6 = number[6] - '0';
-        int n7 = number[7] - '0';
-        int n8 = number[8] - '0';
-        int n9 = number[9] - '0';
-        int n10 = number[10] - '0';
+        // Extract what we need
+        var match = PersonalNumberRegex.Match(number);
 
-        if (n0 < 0 || n0 > 9 || n1 < 0 || n1 > 9 || n2 < 0 || n2 > 9 || n3 < 0 || n3 > 9 ||
-            n4 < 0 || n4 > 9 || n5 < 0 || n5 > 9 || n6 < 0 || n6 > 9 || n7 < 0 || n7 > 9 ||
-            n8 < 0 || n8 > 9 || n9 < 0 || n9 > 9 || n10 < 0 || n10 > 9)
-        {
+        // Regex is only looking for 11 numbers, so we can assume any error is because there are non-numbers
+        if (!match.Success)
             return FodselsnummerResult.FromError(2);
-        }
 
-        int day = n0 * 10 + n1;
-        int month = n2 * 10 + n3;
-        int year = n4 * 10 + n5;
-        int individual = n6 * 100 + n7 * 10 + n8;
-        int gender = n8;
-        int checksum = n9 * 10 + n10;
+        // Parse the numbers
+        var day = int.Parse(match.Groups["day"].Value, CultureInfo.InvariantCulture);
+        var month = int.Parse(match.Groups["month"].Value, CultureInfo.InvariantCulture);
+        var year = int.Parse(match.Groups["year"].Value, CultureInfo.InvariantCulture);
+        var individual = int.Parse(match.Groups["individual"].Value, CultureInfo.InvariantCulture);
+        var gender = int.Parse(match.Groups["gender"].Value, CultureInfo.InvariantCulture);
+        var checksum = int.Parse(match.Groups["checksum"].Value, CultureInfo.InvariantCulture);
 
         var result = new FodselsnummerResult()
         {
@@ -103,55 +90,52 @@ public static class FodselsnummerValidator
 
             int fullYear = 0;
 
-            bool rangeFound = false;
-            foreach (var range in IndividualControlRange)
-            {
-                if (individual >= range.From && individual <= range.To)
-                {
-                    rangeFound = true;
-                    // Note that if there is a change to range so it crosses centuries then we need more checking here - or else the next check will fail
-                    var fYear = (range.FromYear / 100) * 100 + year;
-
-                    // Check that we are within allowed range
-                    if (fYear >= range.FromYear && fYear <= range.ToYear)
-                    {
-                        fullYear = fYear;
-                        break;
-                    }
-                }
-            }
-
-            if (!rangeFound)
+            // Get the range based on the individual range
+            var ranges = IndividualControlRange.Where(r => individual >= r.From && individual <= r.To).ToList();
+            if (ranges == null || ranges.Count == 0)
                 return FodselsnummerResult.FromError(3);
 
+            foreach (var range in ranges)
+            {
+                // Get full year based on the range
+                // Note that if there is a change to range so it crosses centuries then we need more checking here - or else the next check will fail
+                var fYear = int.Parse(range.FromYear.ToString(CultureInfo.InvariantCulture).Substring(0, 2) + year.ToString("D2", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
+
+                // Check that we are within allowed range
+                if (fYear >= range.FromYear && fYear <= range.ToYear)
+                {
+                    fullYear = fYear;
+                    break;
+                }
+            }
             if (fullYear == 0)
                 return FodselsnummerResult.FromError(4);
 
-            try
-            {
-                result.Birthday = new DateTime(fullYear, month, day);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
+            // Have .Net verify the date, using ISO 8601 should be universally safe
+            var iso8601Birthday = fullYear + "-" + month.ToString("D2", CultureInfo.InvariantCulture) + "-" + day.ToString("D2", CultureInfo.InvariantCulture);
+            DateTime dtBirthday;
+            if (!DateTime.TryParse(iso8601Birthday, out dtBirthday))
                 return FodselsnummerResult.FromError(5);
-            }
+            result.Birthday = dtBirthday;
 
         } // End of "only if not FH"-check
 
         // And finally calculate and verify the two checksum digits at the end of the number
+        // Convert personal number string to int array
+        var n = number.Select(c => int.Parse(c.ToString(), CultureInfo.InvariantCulture)).ToArray();
 
         // Calculate checksum number 1
-        int k1 = 11 - (3 * n0 + 7 * n1 + 6 * n2 + 1 * n3 + 8 * n4 + 9 * n5 + 4 * n6 + 5 * n7 + 2 * n8) % 11;
+        int k1 = 11 - (3 * n[0] + 7 * n[1] + 6 * n[2] + 1 * n[3] + 8 * n[4] + 9 * n[5] + 4 * n[6] + 5 * n[7] + 2 * n[8]) % 11;
         if (k1 == 11) k1 = 0;
 
-        if (k1 == 10 || k1 != n9)
+        if (k1 == 10 || k1 != n[9])
             return FodselsnummerResult.FromError(6);
 
         // Calculate checksum number 2
-        int k2 = 11 - (5 * n0 + 4 * n1 + 3 * n2 + 2 * n3 + 7 * n4 + 6 * n5 + 5 * n6 + 4 * n7 + 3 * n8 + 2 * k1) % 11;
+        int k2 = 11 - (5 * n[0] + 4 * n[1] + 3 * n[2] + 2 * n[3] + 7 * n[4] + 6 * n[5] + 5 * n[6] + 4 * n[7] + 3 * n[8] + 2 * k1) % 11;
         if (k2 == 11) k2 = 0;
 
-        if (k2 == 10 || k2 != n10)
+        if (k2 == 10 || k2 != n[10])
             return FodselsnummerResult.FromError(7);
 
         result.Success = true;
