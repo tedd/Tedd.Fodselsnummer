@@ -8,7 +8,7 @@ The framework operates via a synchronous, deterministic validation pipeline, exe
 
 1. **Lexical Analysis:** The input is evaluated using structural constraints to guarantee an eleven-digit numerical format.
 2. **Semantic Verification:** Extracted temporal and individual identifiers are validated against strict historical and contemporary range constraints (e.g., century alignment).
-3. **Cryptographic Validation:** The system performs modulo-11 mathematical verification on the final dual control digits, ensuring absolute compliance with official Norwegian specifications.
+3. **Checksum Validation:** The system performs modulo-11 checksum verification on the final two control digits, ensuring compliance with official Norwegian specifications.
 
 ### Future Architectural Hypotheses
 
