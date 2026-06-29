@@ -9,7 +9,7 @@ public class ValidationBenchmarks
     [Benchmark(Baseline = true)]
     public void Legacy()
     {
-        Tedd.Fodselsnummer.Archive.FodselsnummerValidator.Validate(validNumber);
+        Tedd.Fodselsnummer.Archive.FodselsnummerValidator.ValidateLegacy(validNumber);
     }
 
     [Benchmark]
