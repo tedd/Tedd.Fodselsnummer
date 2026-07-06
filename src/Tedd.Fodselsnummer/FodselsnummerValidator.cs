@@ -66,9 +66,10 @@ public static class FodselsnummerValidator
         int gender = n8;
         int checksum = n9 * 10 + n10;
 
+        // Optimization: O(1) Time, O(1) Space - replace long.Parse with unrolled integer math
         var result = new FodselsnummerResult()
         {
-            Fodselsnummer = long.Parse(number, CultureInfo.InvariantCulture),
+            Fodselsnummer = n0 * 10000000000L + n1 * 1000000000L + n2 * 100000000L + n3 * 10000000L + n4 * 1000000L + n5 * 100000L + n6 * 10000L + n7 * 1000L + n8 * 100L + n9 * 10L + n10,
             Individnummer = individual,
             Kontrollsifre = checksum
         };
