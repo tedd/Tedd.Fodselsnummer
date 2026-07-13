@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -28,7 +28,30 @@ public static class FodselsnummerValidator
 
     public static FodselsnummerResult Validate(long number)
     {
-        return Validate(number.ToString(CultureInfo.InvariantCulture));
+        // A valid 11-digit number starts from 01010000000 (which parsed as long is 1010000000)
+        // to 99999999999.
+        if (number < 1010000000L || number > 99999999999L)
+            return FodselsnummerResult.FromError(1);
+
+        long temp = number;
+        int n10 = (int)(temp % 10); temp /= 10;
+        int n9 = (int)(temp % 10); temp /= 10;
+        int n8 = (int)(temp % 10); temp /= 10;
+        int n7 = (int)(temp % 10); temp /= 10;
+        int n6 = (int)(temp % 10); temp /= 10;
+        int n5 = (int)(temp % 10); temp /= 10;
+        int n4 = (int)(temp % 10); temp /= 10;
+        int n3 = (int)(temp % 10); temp /= 10;
+        int n2 = (int)(temp % 10); temp /= 10;
+        int n1 = (int)(temp % 10); temp /= 10;
+        int n0 = (int)(temp % 10);
+
+        if (temp > 0)
+        {
+            return FodselsnummerResult.FromError(1);
+        }
+
+        return ValidateInternal(n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, number);
     }
 
     // Time complexity: O(1)
@@ -59,6 +82,17 @@ public static class FodselsnummerValidator
             return FodselsnummerResult.FromError(2);
         }
 
+        long parsedNumber;
+        if (!long.TryParse(number, out parsedNumber))
+        {
+            return FodselsnummerResult.FromError(2);
+        }
+
+        return ValidateInternal(n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, parsedNumber);
+    }
+
+    private static FodselsnummerResult ValidateInternal(int n0, int n1, int n2, int n3, int n4, int n5, int n6, int n7, int n8, int n9, int n10, long fodselsnummer)
+    {
         int day = n0 * 10 + n1;
         int month = n2 * 10 + n3;
         int year = n4 * 10 + n5;
@@ -68,7 +102,7 @@ public static class FodselsnummerValidator
 
         var result = new FodselsnummerResult()
         {
-            Fodselsnummer = long.Parse(number, CultureInfo.InvariantCulture),
+            Fodselsnummer = fodselsnummer,
             Individnummer = individual,
             Kontrollsifre = checksum
         };
