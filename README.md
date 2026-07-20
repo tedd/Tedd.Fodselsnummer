@@ -9,6 +9,8 @@ The operational reality of the framework encompasses formal Mod11 checksum verif
 *   **H-nummer (H):** Health institution specific identifiers with shifted month components.
 *   **FH-nummer (FH):** Shared health identifiers featuring specific structural prefixes.
 
+The framework's internal architecture operates exclusively via synchronous direct-computation and explicit manual character indexing. It functions completely independent of external framework dependencies, legacy regex-based extraction, hierarchical data binding, or routed event infrastructures, thereby ensuring deterministic, zero-allocation processing of structural inputs where possible.
+
 ## Contemporary Implementation Example
 The following code exemplifies the API surface utilizing modern .NET top-level statements for deterministic validation and epistemological extraction.
 
@@ -31,4 +33,4 @@ else
 ```
 
 ## Planned Enhancements (Hypotheses)
-The current framework relies on `System.String` implementations. Future iterations hypothesize zero-allocation parsing utilizing `ReadOnlySpan<char>` paradigms to minimize Garbage Collector pressure and increase processing throughput.
+The current framework relies on `System.String` implementations for input ingestion. Future iterations hypothesize the implementation of strict zero-allocation parsing utilizing `ReadOnlySpan<char>` paradigms. This architectural hypothesis aims to minimize Garbage Collector pressure and maximize processing throughput by avoiding intermediary string allocations.
