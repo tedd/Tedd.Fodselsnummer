@@ -26,9 +26,124 @@ public static class FodselsnummerValidator
             new IndividualNumberControlRange() { From = 900, To = 999, FromYear = 1940, ToYear = 1999 },
         };
 
+    // Time complexity: O(1)
+    // Space complexity: O(1)
     public static FodselsnummerResult Validate(long number)
     {
-        return Validate(number.ToString(CultureInfo.InvariantCulture));
+        if (number < 1000000000 || number > 99999999999)
+            return FodselsnummerResult.FromError(1);
+
+        long originalNumber = number;
+
+        int n10 = (int)(number % 10); number /= 10;
+        int n9 = (int)(number % 10); number /= 10;
+        int n8 = (int)(number % 10); number /= 10;
+        int n7 = (int)(number % 10); number /= 10;
+        int n6 = (int)(number % 10); number /= 10;
+        int n5 = (int)(number % 10); number /= 10;
+        int n4 = (int)(number % 10); number /= 10;
+        int n3 = (int)(number % 10); number /= 10;
+        int n2 = (int)(number % 10); number /= 10;
+        int n1 = (int)(number % 10); number /= 10;
+        int n0 = (int)(number % 10);
+
+        int day = n0 * 10 + n1;
+        int month = n2 * 10 + n3;
+        int year = n4 * 10 + n5;
+        int individual = n6 * 100 + n7 * 10 + n8;
+        int gender = n8;
+        int checksum = n9 * 10 + n10;
+
+        var result = new FodselsnummerResult()
+        {
+            Fodselsnummer = originalNumber,
+            Individnummer = individual,
+            Kontrollsifre = checksum
+        };
+
+        // Compensate for FH-numbers
+        if (day >= 80)
+        {
+            result.Type |= FodselsnummerType.FH;
+            day = 1;
+        }
+        else
+        {
+            //
+            // Only if not FH-number
+            //
+
+            // Compensate for D-numbers
+            if (day > 40)
+            {
+                result.Type |= FodselsnummerType.D;
+                day -= 40;
+            }
+            // Compensate for H-numbers
+            if (month > 40)
+            {
+                result.Type |= FodselsnummerType.H;
+                month -= 40;
+            }
+
+            // Determine gender
+            result.Gender = gender % 2 != 0 ? Gender.Male : Gender.Female;
+
+            int fullYear = 0;
+
+            bool rangeFound = false;
+            foreach (var range in IndividualControlRange)
+            {
+                if (individual >= range.From && individual <= range.To)
+                {
+                    rangeFound = true;
+                    // Note that if there is a change to range so it crosses centuries then we need more checking here - or else the next check will fail
+                    var fYear = (range.FromYear / 100) * 100 + year;
+
+                    // Check that we are within allowed range
+                    if (fYear >= range.FromYear && fYear <= range.ToYear)
+                    {
+                        fullYear = fYear;
+                        break;
+                    }
+                }
+            }
+
+            if (!rangeFound)
+                return FodselsnummerResult.FromError(3);
+
+            if (fullYear == 0)
+                return FodselsnummerResult.FromError(4);
+
+            try
+            {
+                result.Birthday = new DateTime(fullYear, month, day);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return FodselsnummerResult.FromError(5);
+            }
+
+        } // End of "only if not FH"-check
+
+        // And finally calculate and verify the two checksum digits at the end of the number
+
+        // Calculate checksum number 1
+        int k1 = 11 - (3 * n0 + 7 * n1 + 6 * n2 + 1 * n3 + 8 * n4 + 9 * n5 + 4 * n6 + 5 * n7 + 2 * n8) % 11;
+        if (k1 == 11) k1 = 0;
+
+        if (k1 == 10 || k1 != n9)
+            return FodselsnummerResult.FromError(6);
+
+        // Calculate checksum number 2
+        int k2 = 11 - (5 * n0 + 4 * n1 + 3 * n2 + 2 * n3 + 7 * n4 + 6 * n5 + 5 * n6 + 4 * n7 + 3 * n8 + 2 * k1) % 11;
+        if (k2 == 11) k2 = 0;
+
+        if (k2 == 10 || k2 != n10)
+            return FodselsnummerResult.FromError(7);
+
+        result.Success = true;
+        return result;
     }
 
     // Time complexity: O(1)
