@@ -9,6 +9,9 @@ The operational reality of the framework encompasses formal Mod11 checksum verif
 *   **H-nummer (H):** Health institution specific identifiers with shifted month components.
 *   **FH-nummer (FH):** Shared health identifiers featuring specific structural prefixes.
 
+### Internal Mechanics
+The framework's internal architecture operates exclusively via synchronous direct-computation and explicit manual character indexing to achieve zero-allocation parsing where possible. It functions completely independent of external framework dependencies, legacy regex-based extraction, hierarchical data binding, or routed event infrastructures.
+
 ## Contemporary Implementation Example
 The following code exemplifies the API surface utilizing modern .NET top-level statements for deterministic validation and epistemological extraction.
 
