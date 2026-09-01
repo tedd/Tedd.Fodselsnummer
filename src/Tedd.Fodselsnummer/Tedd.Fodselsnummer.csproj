@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard1.2</TargetFramework>
+		<TargetFrameworks>netstandard1.2;netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
 		<PackageTags>fødselsnummer;fodselsnummer;personnummer;norweigan social security number</PackageTags>
 		<PackageIcon></PackageIcon>
 		<PackageIconUrl />
@@ -23,6 +23,10 @@
 		<PackageReleaseNotes>nullable, CultureInvariant number conversion internally, simplified framework targets, CLSCompliant assembly</PackageReleaseNotes>
 		<Version>1.1.5</Version>
 	</PropertyGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.2' ">
+		<PackageReference Include="System.Net.Http" Version="4.3.4" />
+		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\..\LICENSE">
