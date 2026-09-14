@@ -3,7 +3,7 @@
 ## Architectural Overview
 Tedd.Fodselsnummer is a high-performance C#/.NET structural library engineered for the parsing, validation, and temporal data extraction of Norwegian national identity numbers.
 
-The operational reality of the framework encompasses formal Mod11 checksum verification and deterministic parsing of the following supported identity protocols:
+The operational reality of the framework encompasses deterministic parsing through explicit manual character indexing, formal Mod11 checksum verification, and algorithmic validation against defined control ranges. The internal architecture operates via synchronous direct-computation completely independent of external framework dependencies, legacy regex-based extraction, hierarchical data binding, or routed event infrastructures. It supports the following identity protocols:
 *   **Fødselsnummer (Normal):** Standard national identity number.
 *   **D-nummer (D):** Temporary identity numbers with mathematically shifted day components.
 *   **H-nummer (H):** Health institution specific identifiers with shifted month components.
