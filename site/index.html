@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7faf9">
+  <meta name="description" content="Tedd.Fodselsnummer parses and structurally validates Norwegian national and health identity numbers for .NET.">
+  <title>Tedd.Fodselsnummer — Norwegian identity number validation for .NET</title>
+  <script>document.documentElement.classList.add('js')</script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Tedd.Fodselsnummer home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>TEDD<span>/</span>FØDSELSNUMMER</span></a>
+    <nav aria-label="Primary navigation"><a href="#types">Number types</a><a href="#validation">Validation</a><a href="#result">Result</a><a href="https://github.com/tedd/Tedd.Fodselsnummer">Source</a><a class="nav-cta" href="#install">Install</a></nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="grid-field" aria-hidden="true"></div>
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> Norwegian identity number structures</p>
+        <h1>Parse the structure.<br><em>Verify the checksums.</em></h1>
+        <p class="lede">Validate eleven-digit Norwegian identity-number formats, classify their encoded type, and extract available date and gender fields through one .NET API.</p>
+        <div class="actions"><a class="button primary" href="#install">Install from NuGet <span aria-hidden="true">↓</span></a><a class="button secondary" href="https://github.com/tedd/Tedd.Fodselsnummer">Read the source <span aria-hidden="true">↗</span></a></div>
+      </div>
+
+      <div class="identity-panel" aria-label="Identity number structure">
+        <div class="window-bar"><span></span><span></span><span></span><b>Structural validation</b></div>
+        <div class="number-layout" aria-hidden="true"><span class="date">DD MM YY</span><span class="individual">III</span><span class="checksum">KK</span></div>
+        <div class="number-labels"><span>Date component</span><span>Individual</span><span>Mod11 × 2</span></div>
+        <div class="validation-status"><i aria-hidden="true"></i><div><span>VALIDATION RESULT</span><strong>Structure and checksums verified</strong></div></div>
+        <div class="result-grid"><p><span>TYPE</span><strong>Normal · D · H · FH</strong></p><p><span>OUTPUT</span><strong>Date · gender · components</strong></p></div>
+      </div>
+    </section>
+
+    <section class="proof-strip" aria-label="Library summary"><p><strong>11 digits</strong><span>Length and digit validation</span></p><p><strong>2 checksums</strong><span>Modulus 11 verification</span></p><p><strong>4 structures</strong><span>Normal, D, H, and FH</span></p><p><strong>O(1)</strong><span>Fixed-width validation</span></p></section>
+
+    <section class="section-shell" id="types">
+      <div class="section-intro reveal"><div><p class="eyebrow">Supported structures</p><h2>Recognize the encoded<br>number type.</h2></div><p>The validator compensates for the date-field offsets used by D- and H-numbers and recognizes the distinct FH-number prefix before checksum evaluation.</p></div>
+      <div class="type-grid">
+        <article class="type-card featured reveal"><span>01</span><h3>Fødselsnummer</h3><p>Standard national identity number with encoded date, individual sequence, and two control digits.</p></article>
+        <article class="type-card reveal"><span>D</span><h3>D-nummer</h3><p>Temporary identity-number structure with 40 added to the encoded day component.</p></article>
+        <article class="type-card reveal"><span>H</span><h3>H-nummer</h3><p>Health-institution helper-number structure with 40 added to the encoded month component.</p></article>
+        <article class="type-card reveal"><span>FH</span><h3>FH-nummer</h3><p>Shared health helper-number structure identified by an initial digit of eight or nine.</p></article>
+      </div>
+    </section>
+
+    <section class="validation-section section-shell" id="validation">
+      <div class="validation-copy reveal"><p class="eyebrow">Deterministic validation</p><h2>Reject malformed input at the precise stage.</h2><p>The result distinguishes length, digit, individual-range, year-range, date, and checksum failures. Successful ordinary, D-, and H-number parsing also resolves the encoded birth date and gender field.</p><p class="constraint"><strong>Structural validation only.</strong> A valid format and checksum do not establish that a number was issued, remains active, or belongs to a particular person.</p></div>
+      <ol class="pipeline reveal">
+        <li><span>1</span><div><strong>Shape</strong><small>Require exactly eleven decimal digits.</small></div></li>
+        <li><span>2</span><div><strong>Classification</strong><small>Detect Normal, D, H, or FH structure.</small></div></li>
+        <li><span>3</span><div><strong>Date and range</strong><small>Resolve permitted century ranges and calendar validity.</small></div></li>
+        <li><span>4</span><div><strong>Control digits</strong><small>Calculate and verify both modulus-11 checksums.</small></div></li>
+      </ol>
+    </section>
+
+    <section class="section-shell result-section" id="result">
+      <div class="section-intro reveal"><div><p class="eyebrow">Explicit result object</p><h2>Success, classification,<br>or a specific error.</h2></div><p><code>FodselsnummerResult</code> carries the validation state, error code and message, classified type, and decoded fields where the format provides them.</p></div>
+      <div class="code-window reveal"><div class="window-bar"><span></span><span></span><span></span><b>Program.cs</b></div><pre><code><b>using</b> Tedd.Fodselsnummer;
+
+FodselsnummerResult result =
+    FodselsnummerValidator.Validate(input);
+
+<b>if</b> (!result.Success)
+    Console.WriteLine(result.ErrorMessage);
+<b>else</b>
+    Console.WriteLine($"{result.Type}: {result.Birthday:yyyy-MM-dd}");</code></pre><div class="result-fields"><span>Success</span><span>ErrorCode</span><span>ErrorMessage</span><span>Type</span><span>Gender</span><span>Birthday</span><span>Individnummer</span><span>Kontrollsifre</span></div></div>
+    </section>
+
+    <section class="install section-shell" id="install">
+      <div class="install-card reveal"><div><p class="eyebrow">NuGet package</p><h2>Add structural validation.</h2><p>Targets .NET Standard 1.2 and is licensed under LGPL-3.0.</p></div><div class="install-command"><span>TERMINAL</span><code>dotnet add package Tedd.Fodselsnummer</code><button type="button" data-copy="dotnet add package Tedd.Fodselsnummer">Copy</button></div><div class="actions"><a class="button primary" href="https://www.nuget.org/packages/Tedd.Fodselsnummer">View on NuGet <span aria-hidden="true">↗</span></a><a class="button secondary" href="https://github.com/tedd/Tedd.Fodselsnummer#contemporary-implementation-example">Read the example</a></div></div>
+    </section>
+  </main>
+
+  <footer><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>TEDD/FØDSELSNUMMER</span></a><p>Structural validation for Norwegian identity-number formats.</p><div><a href="https://www.nuget.org/packages/Tedd.Fodselsnummer">NuGet</a><a href="https://github.com/tedd/Tedd.Fodselsnummer">Source</a><a href="https://github.com/tedd/Tedd.Fodselsnummer/blob/main/LICENSE">LGPL-3.0</a></div></footer>
+</body>
+</html>

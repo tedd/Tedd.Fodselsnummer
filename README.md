@@ -1,5 +1,7 @@
 # Tedd.Fodselsnummer
 
+[Website](https://tedd.no/Tedd.Fodselsnummer/) · [NuGet](https://www.nuget.org/packages/Tedd.Fodselsnummer) · [Source](https://github.com/tedd/Tedd.Fodselsnummer)
+
 ## Architectural Overview
 Tedd.Fodselsnummer is a high-performance C#/.NET structural library engineered for the parsing, validation, and temporal data extraction of Norwegian national identity numbers.
 
