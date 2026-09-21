@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -26,9 +26,28 @@ public static class FodselsnummerValidator
             new IndividualNumberControlRange() { From = 900, To = 999, FromYear = 1940, ToYear = 1999 },
         };
 
+
+    // Time complexity: O(1)
+    // Space complexity: O(1)
     public static FodselsnummerResult Validate(long number)
     {
-        return Validate(number.ToString(CultureInfo.InvariantCulture));
+        if (number < 1000000000L || number > 99999999999L)
+            return FodselsnummerResult.FromError(1);
+
+        long val = number;
+        int n10 = (int)(val % 10); val /= 10;
+        int n9 = (int)(val % 10); val /= 10;
+        int n8 = (int)(val % 10); val /= 10;
+        int n7 = (int)(val % 10); val /= 10;
+        int n6 = (int)(val % 10); val /= 10;
+        int n5 = (int)(val % 10); val /= 10;
+        int n4 = (int)(val % 10); val /= 10;
+        int n3 = (int)(val % 10); val /= 10;
+        int n2 = (int)(val % 10); val /= 10;
+        int n1 = (int)(val % 10); val /= 10;
+        int n0 = (int)(val % 10);
+
+        return ValidateInternal(n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, number);
     }
 
     // Time complexity: O(1)
@@ -39,7 +58,9 @@ public static class FodselsnummerValidator
         if (number == null || number.Length != 11)
             return FodselsnummerResult.FromError(1);
 
-        // Parse and validate digits manually to eliminate allocations
+        // Use ReadOnlySpan<char> to avoid allocations and enable bounds check elimination where possible, though string indexer is also fast
+        // However, standard string indexing is already zero-allocation.
+        // We will just do the parsing to long correctly.
         int n0 = number[0] - '0';
         int n1 = number[1] - '0';
         int n2 = number[2] - '0';
@@ -52,13 +73,20 @@ public static class FodselsnummerValidator
         int n9 = number[9] - '0';
         int n10 = number[10] - '0';
 
-        if (n0 < 0 || n0 > 9 || n1 < 0 || n1 > 9 || n2 < 0 || n2 > 9 || n3 < 0 || n3 > 9 ||
-            n4 < 0 || n4 > 9 || n5 < 0 || n5 > 9 || n6 < 0 || n6 > 9 || n7 < 0 || n7 > 9 ||
-            n8 < 0 || n8 > 9 || n9 < 0 || n9 > 9 || n10 < 0 || n10 > 9)
+        if ((uint)n0 > 9 || (uint)n1 > 9 || (uint)n2 > 9 || (uint)n3 > 9 ||
+            (uint)n4 > 9 || (uint)n5 > 9 || (uint)n6 > 9 || (uint)n7 > 9 ||
+            (uint)n8 > 9 || (uint)n9 > 9 || (uint)n10 > 9)
         {
             return FodselsnummerResult.FromError(2);
         }
 
+        long fodselsnummer = n0 * 10000000000L + n1 * 1000000000L + n2 * 100000000L + n3 * 10000000L + n4 * 1000000L + n5 * 100000L + n6 * 10000L + n7 * 1000L + n8 * 100L + n9 * 10L + n10;
+
+        return ValidateInternal(n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, fodselsnummer);
+    }
+
+    private static FodselsnummerResult ValidateInternal(int n0, int n1, int n2, int n3, int n4, int n5, int n6, int n7, int n8, int n9, int n10, long number)
+    {
         int day = n0 * 10 + n1;
         int month = n2 * 10 + n3;
         int year = n4 * 10 + n5;
@@ -68,7 +96,7 @@ public static class FodselsnummerValidator
 
         var result = new FodselsnummerResult()
         {
-            Fodselsnummer = long.Parse(number, CultureInfo.InvariantCulture),
+            Fodselsnummer = number,
             Individnummer = individual,
             Kontrollsifre = checksum
         };
