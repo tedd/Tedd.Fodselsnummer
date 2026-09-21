@@ -11,6 +11,9 @@ The operational reality of the framework encompasses formal Mod11 checksum verif
 *   **H-nummer (H):** Health institution specific identifiers with shifted month components.
 *   **FH-nummer (FH):** Shared health identifiers featuring specific structural prefixes.
 
+### Internal Execution Mechanics
+The framework's internal execution path functions via deterministic, synchronous direct-computation. Component extraction and structural validation are executed via explicit manual character indexing (allocating zero heap memory per operation). It is imperative to clarify that the framework explicitly **does not** implement hierarchical data binding, routed event infrastructures, or legacy regex-based extraction for its primary validation flow. The absence of these layers guarantees O(1) time and space complexity.
+
 ## Contemporary Implementation Example
 The following code exemplifies the API surface utilizing modern .NET top-level statements for deterministic validation and epistemological extraction.
 
