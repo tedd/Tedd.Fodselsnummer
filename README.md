@@ -5,6 +5,8 @@
 ## Architectural Overview
 Tedd.Fodselsnummer is a high-performance C#/.NET structural library engineered for the parsing, validation, and temporal data extraction of Norwegian national identity numbers.
 
+The Tedd.Fodselsnummer framework's internal architecture operates via synchronous direct-computation and explicit manual character indexing, completely independent of external framework dependencies, legacy regex-based extraction, hierarchical data binding, or routed event infrastructures.
+
 The operational reality of the framework encompasses formal Mod11 checksum verification and deterministic parsing of the following supported identity protocols:
 *   **Fødselsnummer (Normal):** Standard national identity number.
 *   **D-nummer (D):** Temporary identity numbers with mathematically shifted day components.
@@ -20,15 +22,15 @@ using Tedd.Fodselsnummer;
 
 var validationResult = FodselsnummerValidator.Validate("19121950041");
 
-if (!validationResult.Success)
+if (validationResult is { Success: true } valid)
 {
-    Console.WriteLine($"Validation Error: {validationResult.ErrorMessage}");
+    Console.WriteLine($"Identity Type: {valid.Type}");
+    Console.WriteLine($"Biological Gender: {valid.Gender}");
+    Console.WriteLine($"Temporal Origin (Birthday): {valid.Birthday:yyyy-MM-dd}");
 }
 else
 {
-    Console.WriteLine($"Identity Type: {validationResult.Type}");
-    Console.WriteLine($"Biological Gender: {validationResult.Gender}");
-    Console.WriteLine($"Temporal Origin (Birthday): {validationResult.Birthday:yyyy-MM-dd}");
+    Console.WriteLine($"Validation Error: {validationResult.ErrorMessage}");
 }
 ```
 
