@@ -11,24 +11,19 @@ public static class FodselsnummerValidator
     // Implementation of Norwegian personal number verification based on specifications outlined on https://no.wikipedia.org/wiki/F%C3%B8dselsnummer
     // Version 1: 2016-12-07 Tedd Hansen
 
-    private struct IndividualNumberControlRange
-    {
-        public int From;
-        public int To;
-        public int FromYear;
-        public int ToYear;
-    }
-
-    private static readonly IndividualNumberControlRange[] IndividualControlRange = new[] {
-            new IndividualNumberControlRange() { From = 0,   To = 499, FromYear = 1900, ToYear = 1999 },
-            new IndividualNumberControlRange() { From = 500, To = 749, FromYear = 1854, ToYear = 1899 },
-            new IndividualNumberControlRange() { From = 500, To = 999, FromYear = 2000, ToYear = 2039 },
-            new IndividualNumberControlRange() { From = 900, To = 999, FromYear = 1940, ToYear = 1999 },
-        };
-
+    // Time complexity: O(1)
+    // Space complexity: O(1)
     public static FodselsnummerResult Validate(long number)
     {
-        return Validate(number.ToString(CultureInfo.InvariantCulture));
+        if (number >= 10000000000L && number <= 99999999999L)
+        {
+            return Validate(number.ToString(CultureInfo.InvariantCulture));
+        }
+        else if (number >= 0 && number <= 9999999999L)
+        {
+            return Validate(number.ToString("D11", CultureInfo.InvariantCulture));
+        }
+        return FodselsnummerResult.FromError(1);
     }
 
     // Time complexity: O(1)
@@ -66,9 +61,11 @@ public static class FodselsnummerValidator
         int gender = n8;
         int checksum = n9 * 10 + n10;
 
+        long parsedNumber = n0 * 10000000000L + n1 * 1000000000L + n2 * 100000000L + n3 * 10000000L + n4 * 1000000L + n5 * 100000L + n6 * 10000L + n7 * 1000L + n8 * 100L + n9 * 10L + n10;
+
         var result = new FodselsnummerResult()
         {
-            Fodselsnummer = long.Parse(number, CultureInfo.InvariantCulture),
+            Fodselsnummer = parsedNumber,
             Individnummer = individual,
             Kontrollsifre = checksum
         };
@@ -104,20 +101,38 @@ public static class FodselsnummerValidator
             int fullYear = 0;
 
             bool rangeFound = false;
-            foreach (var range in IndividualControlRange)
+            if (individual <= 499)
             {
-                if (individual >= range.From && individual <= range.To)
+                rangeFound = true;
+                int y = 1900 + year;
+                if (y <= 1999) fullYear = y;
+            }
+            else if (individual >= 500 && individual <= 749)
+            {
+                rangeFound = true;
+                int y = 1800 + year;
+                if (y >= 1854 && y <= 1899) fullYear = y;
+                else
                 {
-                    rangeFound = true;
-                    // Note that if there is a change to range so it crosses centuries then we need more checking here - or else the next check will fail
-                    var fYear = (range.FromYear / 100) * 100 + year;
-
-                    // Check that we are within allowed range
-                    if (fYear >= range.FromYear && fYear <= range.ToYear)
-                    {
-                        fullYear = fYear;
-                        break;
-                    }
+                    y = 2000 + year;
+                    if (y >= 2000 && y <= 2039) fullYear = y;
+                }
+            }
+            else if (individual >= 750 && individual <= 899)
+            {
+                rangeFound = true;
+                int y = 2000 + year;
+                if (y >= 2000 && y <= 2039) fullYear = y;
+            }
+            else if (individual >= 900 && individual <= 999)
+            {
+                rangeFound = true;
+                int y = 1900 + year;
+                if (y >= 1940 && y <= 1999) fullYear = y;
+                else
+                {
+                    y = 2000 + year;
+                    if (y >= 2000 && y <= 2039) fullYear = y;
                 }
             }
 
@@ -127,11 +142,11 @@ public static class FodselsnummerValidator
             if (fullYear == 0)
                 return FodselsnummerResult.FromError(4);
 
-            try
+            if (fullYear >= 1 && fullYear <= 9999 && month >= 1 && month <= 12 && day >= 1 && day <= DateTime.DaysInMonth(fullYear, month))
             {
                 result.Birthday = new DateTime(fullYear, month, day);
             }
-            catch (ArgumentOutOfRangeException)
+            else
             {
                 return FodselsnummerResult.FromError(5);
             }
