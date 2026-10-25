@@ -5,17 +5,18 @@ using BenchmarkDotNet.Running;
 public class ValidationBenchmarks
 {
     private const string validNumber = "19121950041";
+    private const long validLongNumber = 19121950041;
 
     [Benchmark(Baseline = true)]
-    public void Legacy()
+    public void LegacyLong()
     {
-        Tedd.Fodselsnummer.Archive.FodselsnummerValidator.Validate(validNumber);
+        Tedd.Fodselsnummer.Archive.FodselsnummerValidator.Validate(validLongNumber);
     }
 
     [Benchmark]
-    public void Optimized()
+    public void OptimizedLong()
     {
-        Tedd.Fodselsnummer.FodselsnummerValidator.Validate(validNumber);
+        Tedd.Fodselsnummer.FodselsnummerValidator.Validate(validLongNumber);
     }
 }
 
