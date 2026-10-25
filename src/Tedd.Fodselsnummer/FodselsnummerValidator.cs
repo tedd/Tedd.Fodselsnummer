@@ -26,9 +26,27 @@ public static class FodselsnummerValidator
             new IndividualNumberControlRange() { From = 900, To = 999, FromYear = 1940, ToYear = 1999 },
         };
 
+    // Time complexity: O(1)
+    // Space complexity: O(1)
     public static FodselsnummerResult Validate(long number)
     {
-        return Validate(number.ToString(CultureInfo.InvariantCulture));
+        if (number < 1000000000L || number > 99999999999L)
+            return FodselsnummerResult.FromError(1);
+
+        long temp = number;
+        int n10 = (int)(temp % 10); temp /= 10;
+        int n9 = (int)(temp % 10); temp /= 10;
+        int n8 = (int)(temp % 10); temp /= 10;
+        int n7 = (int)(temp % 10); temp /= 10;
+        int n6 = (int)(temp % 10); temp /= 10;
+        int n5 = (int)(temp % 10); temp /= 10;
+        int n4 = (int)(temp % 10); temp /= 10;
+        int n3 = (int)(temp % 10); temp /= 10;
+        int n2 = (int)(temp % 10); temp /= 10;
+        int n1 = (int)(temp % 10); temp /= 10;
+        int n0 = (int)(temp % 10);
+
+        return ValidateInternal(number, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10);
     }
 
     // Time complexity: O(1)
@@ -59,6 +77,17 @@ public static class FodselsnummerValidator
             return FodselsnummerResult.FromError(2);
         }
 
+        long numberLong;
+        if (!long.TryParse(number, NumberStyles.None, CultureInfo.InvariantCulture, out numberLong))
+        {
+            return FodselsnummerResult.FromError(2);
+        }
+
+        return ValidateInternal(numberLong, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10);
+    }
+
+    private static FodselsnummerResult ValidateInternal(long number, int n0, int n1, int n2, int n3, int n4, int n5, int n6, int n7, int n8, int n9, int n10)
+    {
         int day = n0 * 10 + n1;
         int month = n2 * 10 + n3;
         int year = n4 * 10 + n5;
@@ -68,7 +97,7 @@ public static class FodselsnummerValidator
 
         var result = new FodselsnummerResult()
         {
-            Fodselsnummer = long.Parse(number, CultureInfo.InvariantCulture),
+            Fodselsnummer = number,
             Individnummer = individual,
             Kontrollsifre = checksum
         };
