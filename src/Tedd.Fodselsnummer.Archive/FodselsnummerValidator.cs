@@ -29,10 +29,10 @@ public static class FodselsnummerValidator
     private static Regex PersonalNumberRegex = new Regex(@"^(?<birthdate>(?<day>\d\d)(?<month>\d\d)(?<year>\d\d))(?<individual>\d\d(?<gender>\d))(?<checksum>\d\d)$");
     public static FodselsnummerResult Validate(long number)
     {
-        return Validate(number.ToString(CultureInfo.InvariantCulture));
+        return ValidateLegacy(number.ToString(CultureInfo.InvariantCulture));
     }
 
-    public static FodselsnummerResult Validate(string number)
+    public static FodselsnummerResult ValidateLegacy(string number)
     {
         // Is it the correct length?
         if (number == null || number.Length != 11)

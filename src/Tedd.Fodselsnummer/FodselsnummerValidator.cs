@@ -31,8 +31,8 @@ public static class FodselsnummerValidator
         return Validate(number.ToString(CultureInfo.InvariantCulture));
     }
 
-    // Time complexity: O(1)
-    // Space complexity: O(1)
+    // Time complexity: O(1) (Constant time string indexing and arithmetic)
+    // Space complexity: O(1) (Zero-allocation validation)
     public static FodselsnummerResult Validate(string number)
     {
         // Is it the correct length?
@@ -66,9 +66,11 @@ public static class FodselsnummerValidator
         int gender = n8;
         int checksum = n9 * 10 + n10;
 
+        long parsedFodselsnummer = n0 * 10000000000L + n1 * 1000000000L + n2 * 100000000L + n3 * 10000000L + n4 * 1000000L + n5 * 100000L + n6 * 10000L + n7 * 1000L + n8 * 100L + n9 * 10L + n10;
+
         var result = new FodselsnummerResult()
         {
-            Fodselsnummer = long.Parse(number, CultureInfo.InvariantCulture),
+            Fodselsnummer = parsedFodselsnummer,
             Individnummer = individual,
             Kontrollsifre = checksum
         };
