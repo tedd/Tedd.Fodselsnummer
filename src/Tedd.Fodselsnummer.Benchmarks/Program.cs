@@ -4,18 +4,31 @@ using BenchmarkDotNet.Running;
 [MemoryDiagnoser]
 public class ValidationBenchmarks
 {
-    private const string validNumber = "19121950041";
+    private const string validString = "19121950041";
+    private const long validLong = 19121950041L;
 
     [Benchmark(Baseline = true)]
-    public void Legacy()
+    public void LegacyString()
     {
-        Tedd.Fodselsnummer.Archive.FodselsnummerValidator.Validate(validNumber);
+        Tedd.Fodselsnummer.Archive.FodselsnummerValidator.Validate(validString);
     }
 
     [Benchmark]
-    public void Optimized()
+    public void OptimizedString()
     {
-        Tedd.Fodselsnummer.FodselsnummerValidator.Validate(validNumber);
+        Tedd.Fodselsnummer.FodselsnummerValidator.Validate(validString);
+    }
+
+    [Benchmark]
+    public void LegacyLong()
+    {
+        Tedd.Fodselsnummer.Archive.FodselsnummerValidator.Validate(validLong);
+    }
+
+    [Benchmark]
+    public void OptimizedLong()
+    {
+        Tedd.Fodselsnummer.FodselsnummerValidator.Validate(validLong);
     }
 }
 
