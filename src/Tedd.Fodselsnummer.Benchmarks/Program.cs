@@ -4,7 +4,7 @@ using BenchmarkDotNet.Running;
 [MemoryDiagnoser]
 public class ValidationBenchmarks
 {
-    private const string validNumber = "19121950041";
+    private const long validNumber = 19121950041L;
 
     [Benchmark(Baseline = true)]
     public void Legacy()
